@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMI Calculator</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        table { width: 80%; margin: 20px auto; border-collapse: collapse; }
+        th, td { border: 1px solid black; padding: 10px; text-align: center; }
+        input { margin: 5px; padding: 5px; }
+        button { padding: 10px; }
+    </style>
+</head>
+<body>
+    <h2>EMI Calculator</h2>
+    <label>Loan Amount: <input type="number" id="amount" placeholder="Enter amount"></label><br>
+    <label>Interest Rate (% per annum): <input type="number" id="rate" placeholder="Enter rate"></label><br>
+    <label>Tenure (Months): <input type="number" id="tenure" placeholder="Enter tenure"></label><br>
+    <button onclick="calculateEMI()">Calculate EMI</button>
+    
+    <h3>EMI Table</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Month</th>
+                <th>EMI<br>(P+I)</th>
+                <th>Principal<br>(P)</th>
+                <th>Interest<br>(I)</th>
+                <th>Tax<br>(I*18%)</th>
+                <th>Balance</th>
+            </tr>
+        </thead>
+        <tbody id="emiTableBody">
+        </tbody>
+    </table>
+    
+    <h3>Total Summary</h3>
+    <p><strong>Principal Ammount (P):</strong> <span id="totalPrincipal">0.00</span></p>
+    <p><strong>Total Interest Paid (I):</strong> <span id="totalInterest">0.00</span></p>
+    <p><strong>Total Ammount (P+I) Paid:</strong> <span id="totalAmountPaid">0.00</span></p>
+
+    <script>
+        function calculateEMI() {
+            let amount = parseFloat(document.getElementById("amount").value);
+            let rate = parseFloat(document.getElementById("rate").value) / 100 / 12;
+            let tenure = parseInt(document.getElementById("tenure").value);
+            
+            let emi = (amount * rate * Math.pow(1 + rate, tenure)) / (Math.pow(1 + rate, tenure) - 1);
+            let balance = amount;
+            let totalInterestPaid = 0;
+            
+            let tableBody = document.getElementById("emiTableBody");
+            tableBody.innerHTML = "";
+            
+            for (let month = 1; month <= tenure; month++) {
+                let interest = balance * rate;
+                let principal = emi - interest;
+                let taxAmount = interest * 0.18;
+                balance -= principal;
+                totalInterestPaid += interest;
+                
+                let row = `<tr>
+                    <td>${month}</td>
+                    <td>${(principal + interest).toFixed(2)}</td>
+                    <td>${principal.toFixed(2)}</td>
+                    <td>${interest.toFixed(2)}</td>                  
+                    <td>${taxAmount.toFixed(2)}</td>
+                    <td>${balance.toFixed(2)}</td>
+                </tr>`;
+                
+                tableBody.innerHTML += row;
+            }
+            
+            let totalAmountPaid = emi * tenure;
+            document.getElementById("totalPrincipal").innerText = amount.toFixed(2);
+            document.getElementById("totalInterest").innerText = totalInterestPaid.toFixed(2);
+            document.getElementById("totalAmountPaid").innerText = totalAmountPaid.toFixed(2);
+        }
+    </script>
+</body>
+</html>
