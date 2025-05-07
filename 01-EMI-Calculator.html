@@ -258,6 +258,121 @@
     display: none;
   }
 
+  /* View Full Schedule Modal */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right:0;
+    bottom:0;
+    background: rgba(0,0,0,0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .modal {
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 30px;
+    width: 90vw;
+    max-width: 1000px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+    position: relative;
+    color: #332a07;
+  }
+
+  .modal h3 {
+    color: #332a07;
+    text-shadow: none;
+    margin-top: 0;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+
+  .modal table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 8px 8px;
+  }
+
+  .modal thead {
+    background: #ffa726;
+    color: #332a07;
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+
+  .modal tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .modal tbody tr:hover {
+    background: #ffb74d99;
+    color: #332a07;
+  }
+
+  .modal tbody td {
+    padding: 12px 10px;
+    background: rgba(255, 255, 255, 0.30);
+    border-radius: 8px;
+    white-space: nowrap;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #332a07;
+  }
+
+  .modal-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #ffa726;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    font-weight: 900;
+    font-size: 1.2rem;
+    color: #332a07;
+    cursor: pointer;
+    box-shadow: 0 4px 8px #d18a00;
+    transition: background-color 0.3s ease;
+  }
+
+  .modal-close-btn:hover {
+    background: #ffb74d;
+    box-shadow: 0 6px 12px #ffdd7a;
+  }
+
+  /* View Full Button */
+  #viewFullBtn {
+    margin-top: 10px;
+    background: #6ab04c;
+    border: none;
+    padding: 14px;
+    border-radius: 14px;
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 6px 12px #26a65b;
+    transition: background-color 0.25s ease, box-shadow 0.25s ease;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    user-select: none;
+    width: 420px;
+    max-width: 100%;
+  }
+
+  #viewFullBtn:hover {
+    background: #7bd55f;
+    box-shadow: 0 8px 20px #93e175;
+  }
+
   /* Responsive */
   @media (max-width: 940px) {
     #page-wrapper {
@@ -277,6 +392,9 @@
     .scrollable-wrapper {
       width: 100%;
       max-width: 100%;
+    }
+    #viewFullBtn {
+      width: 100%;
     }
   }
 
@@ -344,6 +462,8 @@
         </table>
       </div>
     </div>
+
+    <button id="viewFullBtn" class="hidden">View Full Schedule</button>
     
     <div class="summary-line grouped-summary hidden" id="summaryLine1">
       <span><strong>Total Principal (P)</strong><br><span id="totalPrincipal">0.00</span></span>
@@ -354,9 +474,30 @@
     <div class="summary-line grouped-summary hidden" id="summaryLine2">
       <span><strong>Total GST 18%</strong><br><span id="totalGst">0.00</span></span>
     </div>
-    
+
     <div class="summary-line grouped-summary hidden" id="summaryLine3">
       <span><strong>(Principal + Intrest + GST 18%)</strong><br><span id="totalWithGst">0.00</span></span>
+    </div>
+  </div>
+
+  <!-- Modal for full schedule -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <button class="modal-close-btn" id="modalCloseBtn" title="Close">&times;</button>
+      <h3>Full EMI Schedule</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Month</th>
+            <th>EMI<br>(P+I)</th>
+            <th>Principal<br>(P)</th>
+            <th>Interest<br>(I)</th>
+            <th>Tax<br>(I*18%)</th>
+            <th>Balance</th>
+          </tr>
+        </thead>
+        <tbody id="modalTableBody"></tbody>
+      </table>
     </div>
   </div>
 
@@ -378,6 +519,11 @@
     const summaryLine1 = document.getElementById('summaryLine1');
     const summaryLine2 = document.getElementById('summaryLine2');
     const summaryLine3 = document.getElementById('summaryLine3');
+    const viewFullBtn = document.getElementById('viewFullBtn');
+
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalCloseBtn = document.getElementById('modalCloseBtn');
+    const modalTableBody = document.getElementById('modalTableBody');
 
     function formatMoney(num) {
       return num.toFixed(2);
@@ -403,10 +549,17 @@
       return true;
     }
 
+    function clearTableAndModal() {
+      emiTableBody.innerHTML = '';
+      modalTableBody.innerHTML = '';
+    }
+
     function calculateEMI() {
       if (!validateInputs()) {
         return;
       }
+
+      clearTableAndModal();
 
       const amount = parseFloat(amountInput.value);
       const monthlyRate = parseFloat(rateInput.value) / 100 / 12;
@@ -419,7 +572,8 @@
       let balance = amount;
       let totalInterestPaid = 0;
 
-      emiTableBody.innerHTML = '';
+      // Build table rows and keep data for modal
+      const rows = [];
 
       for (let month = 1; month <= tenure; month++) {
         const interest = balance * monthlyRate;
@@ -433,9 +587,7 @@
 
         totalInterestPaid += interest;
 
-        const row = document.createElement('tr');
-
-        row.innerHTML = `
+        const rowHTML = `
           <td>${month}</td>
           <td>${formatMoney(principal + interest)}</td>
           <td>${formatMoney(principal)}</td>
@@ -443,10 +595,34 @@
           <td>${formatMoney(tax)}</td>
           <td>${formatMoney(balance)}</td>
         `;
-        emiTableBody.appendChild(row);
+
+        rows.push(rowHTML);
       }
 
-      emiTableBody.parentElement.classList.add('scrollable-tbody');
+      // Determine number of rows to show in main table (max 9)
+      const visibleRowsCount = 9;
+
+      rows.forEach((rowHTML, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = rowHTML;
+        emiTableBody.appendChild(row);
+      });
+
+      // Apply scrollable tbody if tenure > 9
+      if (tenure > visibleRowsCount) {
+        emiTableBody.parentElement.classList.add('scrollable-tbody');
+        viewFullBtn.classList.remove('hidden');
+      } else {
+        emiTableBody.parentElement.classList.remove('scrollable-tbody');
+        viewFullBtn.classList.add('hidden');
+      }
+
+      // Fill modal table with all rows
+      rows.forEach(rowHTML => {
+        const row = document.createElement('tr');
+        row.innerHTML = rowHTML;
+        modalTableBody.appendChild(row);
+      });
 
       const totalAmountPaid = emi * tenure;
       const totalGST = totalInterestPaid * 0.18;
@@ -464,6 +640,26 @@
       summaryLine2.classList.remove('hidden');
       summaryLine3.classList.remove('hidden');
     }
+
+    // Show modal when clicking "View Full Schedule"
+    viewFullBtn.addEventListener('click', () => {
+      modalOverlay.style.display = 'flex';
+      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    });
+
+    // Close modal
+    modalCloseBtn.addEventListener('click', () => {
+      modalOverlay.style.display = 'none';
+      document.body.style.overflow = '';
+    });
+
+    // Close modal when clicking outside modal content
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) {
+        modalOverlay.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    });
 
     calculateBtn.addEventListener('click', calculateEMI);
   })();
