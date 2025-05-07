@@ -11,28 +11,39 @@
   }
 
   html, body {
-    height: 100%;
     margin: 0;
+    padding: 0;
+    height: 100%;
+    background: linear-gradient(135deg, #65799b, #5e2563);
+    color: #f0f0f0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
 
   body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #65799b, #5e2563);
-    color: #f0f0f0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     padding: 20px;
-    text-align: center;
-    /* Center content initially */
+  }
+
+  /* Container that centers the calculator vertically and horizontally */
+  #calcContainer {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    transition: all 0.5s ease;
+    width: 100%;
+    max-width: 420px;
   }
 
-  body.loaded {
-    /* Normal after loading */
-    display: block;
+  /* Hide calc container vertical centering once schedule visible */
+  body.calculated #calcContainer {
     min-height: auto;
+    height: auto;
+    margin-bottom: 40px;
+    justify-content: flex-start;
+    align-items: stretch;
   }
 
   h2 {
@@ -41,6 +52,7 @@
     margin-bottom: 10px;
     letter-spacing: 2px;
     text-shadow: 0 0 8px #ffb347;
+    text-align: center;
   }
 
   .calculator {
@@ -50,8 +62,6 @@
     padding: 25px 30px 40px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
     width: 100%;
-    max-width: 420px;
-    margin-bottom: 40px;
   }
 
   .input-group {
@@ -139,6 +149,7 @@
     color: #ffd67a;
     text-shadow: 0 0 8px #ffaa33;
     margin-bottom: 5px;
+    text-align: center;
   }
 
   /* Scrollable wrapper for horizontal overflow */
@@ -271,11 +282,14 @@
       width: 100%;
       text-align: center;
     }
+    #calcContainer {
+      max-width: 100%;
+      padding: 20px;
+    }
   }
 
   @media (max-width: 480px) {
     .calculator {
-      max-width: 100%;
       padding: 25px 20px 35px;
     }
     button {
@@ -328,22 +342,25 @@
 </style>
 </head>
 <body>
-  <div id="centerWrapper">
-  <h2>EMI Calculator</h2>
-  <div class="calculator">
-    <div class="input-group">
-      <label for="amount">Loan Amount</label>
-      <input type="number" id="amount" placeholder="Enter Amount" min="0" />
+  <div id="calcContainer">
+    <div>
+      <h2>EMI Calculator</h2>
+      <div class="calculator">
+        <div class="input-group">
+          <label for="amount">Loan Amount</label>
+          <input type="number" id="amount" placeholder="Enter Amount" min="0" />
+        </div>
+        <div class="input-group">
+          <label for="rate">Interest Rate % (p.a)</label>
+          <input type="number" id="rate" placeholder="Enter Interest Rate" step="0.01" min="0" />
+        </div>
+        <div class="input-group">
+          <label for="tenure">Tenure (Months)</label>
+          <input type="number" id="tenure" placeholder="Enter Tenure" min="1" />
+        </div>
+        <button id="calculateBtn">Calculate EMI</button>
+      </div>
     </div>
-    <div class="input-group">
-      <label for="rate">Interest Rate % (p.a)</label>
-      <input type="number" id="rate" placeholder="Enter Interest Rate" step="0.01" min="0" />
-    </div>
-    <div class="input-group">
-      <label for="tenure">Tenure (Months)</label>
-      <input type="number" id="tenure" placeholder="Enter Tenure" min="1" />
-    </div>
-    <button id="calculateBtn">Calculate EMI</button>
   </div>
 
   <h3 id="emiScheduleTitle" class="hidden">EMI Schedule</h3>
@@ -379,7 +396,6 @@
   
   <div class="summary-line grouped-summary hidden" id="summaryLine3">
     <span><strong>Total Amount (P + I + GST 18%):</strong> <span id="totalWithGst">0.00</span></span>
-  </div>
   </div>
 
 <script>
@@ -496,6 +512,9 @@
       summaryLine1.classList.remove('hidden');
       summaryLine2.classList.remove('hidden');
       summaryLine3.classList.remove('hidden');
+
+      // Add class to body to remove vertical centering after calculation
+      document.body.classList.add('calculated');
     }
 
     // Toggle View button functionality
@@ -512,11 +531,6 @@
     });
 
     calculateBtn.addEventListener('click', calculateEMI);
-
-    // After page load, remove centering and set to normal layout
-    window.addEventListener('load', () => {
-      document.body.classList.add('loaded');
-    });
   })();
 </script>
 </body>
