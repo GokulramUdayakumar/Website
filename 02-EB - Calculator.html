@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Electricity Bill Calculator (Stylish)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 30px;
+      color: #333;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    h2 {
+      text-align: center;
+      color: #4CAF50;
+      margin-bottom: 25px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 8px;
+    }
+    input, button {
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #output {
+      margin-top: 30px;
+      font-size: 1rem;
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+      min-height: 110px;
+      display: none; /* hide initially */
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 1rem;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+    tbody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    .highlight {
+      font-weight: bold;
+      color: #4CAF50;
+    }
+    @media (max-width: 420px) {
+      body {
+        padding: 15px;
+        max-width: 100%;
+      }
+      input, button {
+        font-size: 0.9rem;
+        padding: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h2>Electricity Bill Calculator</h2>
+  
+  <label for="units">Enter Units Consumed:</label>
+  <input type="number" id="units" placeholder="e.g. 750" min="1" />
+  <button onclick="calculateBill()">Calculate</button>
+
+  <div id="output"></div>
+
+  <script>
+    function calculateBill() {
+      const units = parseInt(document.getElementById('units').value);
+      if (isNaN(units) || units <= 0) {
+        const outputElem = document.getElementById('output');
+        outputElem.innerText = "Please enter a valid number of units.";
+        outputElem.style.display = 'block';
+        return;
+      }
+
+      let total = 0;
+      let output = "";
+
+      if (units <= 500) {
+        let remaining = units;
+
+        if (remaining > 100) remaining -= 100;
+        else remaining = 0;
+
+        const slab1 = Math.min(remaining, 100);
+        total += slab1 * 2.35;
+        remaining -= slab1;
+
+        const slab2 = Math.min(remaining, 200);
+        total += slab2 * 4.7;
+        remaining -= slab2;
+
+        const slab3 = Math.min(remaining, 100);
+        total += slab3 * 6.3;
+
+        output += `<p><strong>Slab system used:</strong> Old Slab (≤ 500 Units)</p>`;
+
+        output += `<table>
+                    <thead>
+                      <tr><th>Slab Rate</th><th>Rate (Per Unit)</th><th>Units</th><th>Cost</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>1) 1–100</td><td>0</td><td>${Math.min(units, 100)}</td><td>0.00</td></tr>
+                      <tr><td>2) 101–200</td><td>2.35</td><td>${slab1}</td><td>${(slab1*2.35).toFixed(2)}</td></tr>
+                      <tr><td>3) 201–400</td><td>4.70</td><td>${slab2}</td><td>${(slab2*4.7).toFixed(2)}</td></tr>
+                      <tr><td>4) 401–500</td><td>6.30</td><td>${slab3}</td><td>${(slab3*6.3).toFixed(2)}</td></tr>
+                    </tbody>
+                  </table>`;
+      } else {
+        let rem = units;
+
+        const slabFree = Math.min(rem, 100);
+        if (rem > 100) rem -= 100;
+        else rem = 0;
+
+        const s1 = Math.min(rem, 300);
+        total += s1 * 4.7;
+        rem -= s1;
+
+        const s2 = Math.min(rem, 100);
+        total += s2 * 6.3;
+        rem -= s2;
+
+        const s3 = Math.min(rem, 100);
+        total += s3 * 8.4;
+        rem -= s3;
+
+        const s4 = Math.min(rem, 200);
+        total += s4 * 9.45;
+        rem -= s4;
+
+        const s5 = Math.min(rem, 200);
+        total += s5 * 10.5;
+        rem -= s5;
+
+        const s6 = rem > 0 ? rem : 0;
+        if (rem > 0) {
+          total += rem * 11.55;
+          rem = 0;
+        }
+
+        output += `<p><strong>Slab System Used:</strong> New slab (> 500 Units)</p>`;
+
+        output += `<table>
+                    <thead>
+                      <tr><th>Slab Rate</th><th>Rate (Per Unit)</th><th>Units</th><th>Cost</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>1) 1–100</td><td>0</td><td>${slabFree}</td><td>0.00</td></tr>
+                      <tr><td>2) 101–400</td><td>4.70</td><td>${s1}</td><td>${(s1*4.7).toFixed(2)}</td></tr>
+                      <tr><td>3) 401–500</td><td>6.30</td><td>${s2}</td><td>${(s2*6.3).toFixed(2)}</td></tr>
+                      <tr><td>4) 501–600</td><td>8.40</td><td>${s3}</td><td>${(s3*8.4).toFixed(2)}</td></tr>
+                      <tr><td>5) 601–800</td><td>9.45</td><td>${s4}</td><td>${(s4*9.45).toFixed(2)}</td></tr>
+                      <tr><td>6) 801–1000</td><td>10.50</td><td>${s5}</td><td>${(s5*10.5).toFixed(2)}</td></tr>
+                      <tr><td>7) 1001 And Above</td><td>11.55</td><td>${s6}</td><td>${(s6*11.55).toFixed(2)}</td></tr>
+                    </tbody>
+                  </table>`;
+      }
+
+      output += `<p><strong>Total Units:</strong> ${units}</p>`;
+      output += `<p><strong>Total Amount:</strong> <span class="highlight">₹${total.toFixed(2)}</span></p>`;
+
+      const outputElem = document.getElementById('output');
+      outputElem.innerHTML = output;
+      outputElem.style.display = 'block'; 
+    }
+  </script>
+</body>
+</html>
