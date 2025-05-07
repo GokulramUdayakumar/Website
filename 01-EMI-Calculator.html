@@ -101,20 +101,39 @@
     box-shadow: 0 8px 20px #ffd67a;
   }
 
+  /* New toggle button */
+  #toggleViewBtn {
+    margin: 10px auto 30px auto;
+    width: 220px;
+    background: #4caf50;
+    color: #fff;
+    box-shadow: 0 6px 12px #6fdc6f;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    border-radius: 14px;
+    padding: 10px 0;
+    user-select: none;
+  }
+  #toggleViewBtn:hover {
+    background: #66bb6a;
+    box-shadow: 0 8px 20px #8fdf8f;
+  }
+
   /* EMI Schedule title */
   h3 {
     font-size: 1.6rem;
     font-weight: 900;
     color: #ffd67a;
     text-shadow: 0 0 8px #ffaa33;
-    margin-bottom: 15px;
+    margin-bottom: 5px;
   }
 
   /* Wider table outside layout box */
   .emi-schedule {
     width: 95%;
     max-width: 900px;
-    margin: 0 auto 30px;
+    margin: 0 auto 10px;
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(255, 182, 41, 0.6);
@@ -141,7 +160,19 @@
     padding: 18px 14px;
   }
 
+  tbody {
+    display: block;
+  }
+
+  tbody.scrollable-tbody {
+    max-height: 360px;
+    overflow-y: auto;
+  }
+
   tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
     color: #fff;
     font-weight: 600;
     font-size: 1.1rem;
@@ -162,48 +193,63 @@
     white-space: nowrap;
   }
 
-  /* Scrollable tbody */
-  tbody {
-    display: block;
-    max-height: 280px;
-    overflow-y: auto;
-  }
   thead, tbody tr {
     display: table;
     width: 100%;
     table-layout: fixed;
   }
 
-  .summary {
+  /* Summary lines container */
+  .summary-line {
     width: 95%;
     max-width: 900px;
-    margin: 0 auto 40px;
-    text-align: center;
+    margin: 8px auto;
     font-weight: 700;
     font-size: 1.2rem;
     color: #ffd67a;
     text-shadow: 0 0 6px #ffaa33;
     line-height: 1.6;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
   }
 
-  .summary span {
+  .summary-line span {
     display: inline-block;
-    min-width: 130px;
+    min-width: 150px;
     color: #332a07;
     font-weight: 900;
     background: #ffb74d;
     padding: 6px 18px;
     border-radius: 14px;
     box-shadow: 0 6px 12px #fcbf49;
-    margin-left: 15px;
+    text-align: center;
+  }
+
+  /* Group container for line 1 */
+  .grouped-summary {
+    background: #ffdc80;
+    padding: 10px 20px;
+    border-radius: 16px;
+    box-shadow: 0 6px 12px #fcbf49;
+  }
+
+  /* Hidden class */
+  .hidden {
+    display: none;
   }
 
   /* Responsive */
   @media (max-width: 960px) {
-    .emi-schedule, .summary {
+    .emi-schedule, .summary-line {
       max-width: 100%;
       width: 95%;
-      margin: 0 auto 30px;
+      margin: 10px auto;
+      flex-wrap: wrap;
+    }
+    .grouped-summary {
+      width: 100%;
+      text-align: center;
     }
   }
 
@@ -230,6 +276,27 @@
       font-size: 1.4rem;
       margin-bottom: 10px;
     }
+
+    .summary-line {
+      flex-direction: column;
+      gap: 10px;
+      font-size: 1rem;
+    }
+
+    .summary-line span {
+      min-width: auto;
+      padding: 6px 12px;
+    }
+
+    .grouped-summary {
+      padding: 12px 15px;
+    }
+
+    #toggleViewBtn {
+      width: 100%;
+      max-width: 280px;
+      margin: 15px auto 30px auto;
+    }
   }
 
   @media (max-width: 360px) {
@@ -245,40 +312,50 @@
   <div class="calculator">
     <div class="input-group">
       <label for="amount">Loan Amount</label>
-      <input type="number" id="amount" placeholder="Enter amount" min="0" />
+      <input type="number" id="amount" placeholder="Enter Amount" min="0" />
     </div>
     <div class="input-group">
-      <label for="rate">Interest Rate (% p.a.)</label>
-      <input type="number" id="rate" placeholder="Enter interest rate" step="0.01" min="0" />
+      <label for="rate">Interest Rate % (p.a)</label>
+      <input type="number" id="rate" placeholder="Enter Interest Rate" step="0.01" min="0" />
     </div>
     <div class="input-group">
       <label for="tenure">Tenure (Months)</label>
-      <input type="number" id="tenure" placeholder="Enter tenure" min="1" />
+      <input type="number" id="tenure" placeholder="Enter Tenure" min="1" />
     </div>
     <button id="calculateBtn">Calculate EMI</button>
   </div>
 
-  <h3>EMI Schedule</h3>
-  <div class="emi-schedule">
+  <h3 id="emiScheduleTitle" class="hidden">EMI Schedule</h3>
+  <div class="emi-schedule hidden" id="emiScheduleDiv">
     <table>
       <thead>
         <tr>
           <th>Month</th>
-          <th>EMI (P + I)</th>
-          <th>Principal (P)</th>
-          <th>Interest (I)</th>
-          <th>Tax (I × 18%)</th>
+          <th>EMI<br>(P+I)</th>
+          <th>Principal<br>(P)</th>
+          <th>Interest<br>(I)</th>
+          <th>Tax<br>(I*18%)</th>
           <th>Balance</th>
         </tr>
       </thead>
       <tbody id="emiTableBody"></tbody>
     </table>
   </div>
+  
+  <button id="toggleViewBtn" class="hidden">View Full Table</button>
 
-  <div class="summary">
-    <p><strong>Total Principal (P):</strong> <span id="totalPrincipal">0.00</span></p>
-    <p><strong>Total Interest (I):</strong> <span id="totalInterest">0.00</span></p>
-    <p><strong>Total Amount (P + I):</strong> <span id="totalAmountPaid">0.00</span></p>
+  <div class="summary-line grouped-summary hidden" id="summaryLine1">
+    <span><strong>Total Principal (P):</strong> <span id="totalPrincipal">0.00</span></span>
+    <span><strong>Total Interest (I):</strong> <span id="totalInterest">0.00</span></span>
+    <span><strong>Total - Principal (P) + Intrest (I):</strong> <span id="totalAmountPaid">0.00</span></span>
+  </div>
+
+  <div class="summary-line grouped-summary hidden" id="summaryLine2">
+    <span><strong>Total GST 18%:</strong> <span id="totalGst">0.00</span></span>
+  </div>
+  
+  <div class="summary-line grouped-summary hidden" id="summaryLine3">
+    <span><strong>Total Amount (P + I + GST 18%):</strong> <span id="totalWithGst">0.00</span></span>
   </div>
 
 <script>
@@ -291,6 +368,16 @@
     const totalPrincipalEl = document.getElementById('totalPrincipal');
     const totalInterestEl = document.getElementById('totalInterest');
     const totalAmountPaidEl = document.getElementById('totalAmountPaid');
+    const totalGstEl = document.getElementById('totalGst');
+    const totalWithGstEl = document.getElementById('totalWithGst');
+    const tbodyElement = document.querySelector('tbody');
+
+    const emiScheduleDiv = document.getElementById('emiScheduleDiv');
+    const emiScheduleTitle = document.getElementById('emiScheduleTitle');
+    const summaryLine1 = document.getElementById('summaryLine1');
+    const summaryLine2 = document.getElementById('summaryLine2');
+    const summaryLine3 = document.getElementById('summaryLine3');
+    const toggleViewBtn = document.getElementById('toggleViewBtn');
 
     function formatMoney(num) {
       return num.toFixed(2);
@@ -325,7 +412,6 @@
       const monthlyRate = parseFloat(rateInput.value) / 100 / 12;
       const tenure = parseInt(tenureInput.value, 10);
 
-      // EMI formula: E = P*r*(1+r)^n / ((1+r)^n -1)
       const emi = monthlyRate === 0
         ? amount / tenure
         : (amount * monthlyRate * Math.pow(1 + monthlyRate, tenure)) / (Math.pow(1 + monthlyRate, tenure) - 1);
@@ -341,7 +427,6 @@
         const tax = interest * 0.18;
         balance -= principal;
 
-        // Correct any floating point tiny error for last balance
         if (month === tenure) {
           balance = 0;
         }
@@ -350,28 +435,60 @@
 
         const row = document.createElement('tr');
 
-        row.innerHTML = \`
-          <td>\${month}</td>
-          <td>\${formatMoney(principal + interest)}</td>
-          <td>\${formatMoney(principal)}</td>
-          <td>\${formatMoney(interest)}</td>
-          <td>\${formatMoney(tax)}</td>
-          <td>\${formatMoney(balance)}</td>
-        \`;
+        row.innerHTML = `
+          <td>${month}</td>
+          <td>${formatMoney(principal + interest)}</td>
+          <td>${formatMoney(principal)}</td>
+          <td>${formatMoney(interest)}</td>
+          <td>${formatMoney(tax)}</td>
+          <td>${formatMoney(balance)}</td>
+        `;
         emiTableBody.appendChild(row);
       }
 
+      // Show toggleViewBtn only if tenure > 9
+      if (tenure > 9) {
+        tbodyElement.classList.add('scrollable-tbody');
+        toggleViewBtn.textContent = "View Full Table";
+        toggleViewBtn.classList.remove('hidden');
+        fullView = false; // reset toggle state
+      } else {
+        tbodyElement.classList.remove('scrollable-tbody');
+        toggleViewBtn.classList.add('hidden');
+      }
+
       const totalAmountPaid = emi * tenure;
+      const totalGST = totalInterestPaid * 0.18;
+      const totalWithGST = amount + totalInterestPaid + totalGST;
 
       totalPrincipalEl.textContent = formatMoney(amount);
       totalInterestEl.textContent = formatMoney(totalInterestPaid);
       totalAmountPaidEl.textContent = formatMoney(totalAmountPaid);
+      totalGstEl.textContent = formatMoney(totalGST);
+      totalWithGstEl.textContent = formatMoney(totalWithGST);
+
+      emiScheduleDiv.classList.remove('hidden');
+      emiScheduleTitle.classList.remove('hidden');
+      summaryLine1.classList.remove('hidden');
+      summaryLine2.classList.remove('hidden');
+      summaryLine3.classList.remove('hidden');
     }
+
+    // Toggle View button functionality
+    let fullView = false;
+    toggleViewBtn.addEventListener('click', () => {
+      fullView = !fullView;
+      if (fullView) {
+        tbodyElement.classList.remove('scrollable-tbody');
+        toggleViewBtn.textContent = "View Scrollable Table";
+      } else {
+        tbodyElement.classList.add('scrollable-tbody');
+        toggleViewBtn.textContent = "View Full Table";
+      }
+    });
 
     calculateBtn.addEventListener('click', calculateEMI);
   })();
 </script>
 </body>
 </html>
-</content>
-</create_file>
