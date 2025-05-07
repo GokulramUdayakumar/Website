@@ -135,6 +135,7 @@
     max-width: 900px;
     margin: 0 auto 10px;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     border-radius: 16px;
     box-shadow: 0 10px 30px rgba(255, 182, 41, 0.6);
     background: rgba(255, 255, 255, 0.15);
@@ -150,8 +151,9 @@
   table {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 8px 8px; /* add spacing between cells for margin effect */
+    border-spacing: 8px 8px; /* space for margin effect */
     margin: 0;
+    min-width: 700px; /* Force horizontal scroll on small devices */
   }
 
   thead {
@@ -359,17 +361,17 @@
   <button id="toggleViewBtn" class="hidden">View Full Table</button>
 
   <div class="summary-line grouped-summary hidden" id="summaryLine1">
-    <span><strong>Total Principal (P):</strong><br><span id="totalPrincipal">0.00</span></span>
-    <span><strong>Total Interest (I):</strong><br><span id="totalInterest">0.00</span></span>
-    <span><strong>Total (Principal + Intrest) :</strong><br><span id="totalAmountPaid">0.00</span></span>
+    <span><strong>Total Principal (P)</strong><br><span id="totalPrincipal">0.00</span></span>
+    <span><strong>Total Interest (I)</strong><br><span id="totalInterest">0.00</span></span>
+    <span><strong>Total (Principal + Intrest)</strong><br><span id="totalAmountPaid">0.00</span></span>
   </div>
 
   <div class="summary-line grouped-summary hidden" id="summaryLine2">
-    <span><strong>Total GST 18%:</strong> <span id="totalGst">0.00</span></span>
+    <span><strong>Total GST 18%</strong><br><span id="totalGst">0.00</span></span>
   </div>
   
   <div class="summary-line grouped-summary hidden" id="summaryLine3">
-    <span><strong>Total Amount (P + I + GST 18%):</strong> <span id="totalWithGst">0.00</span></span>
+    <span><strong>Total Amount (P + I + GST 18%)</strong><br><span id="totalWithGst">0.00</span></span>
   </div>
 
 <script>
