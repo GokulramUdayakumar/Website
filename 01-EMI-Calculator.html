@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>EMI Calculator</title>
 <style>
   /* Reset and base */
@@ -10,14 +10,33 @@
     box-sizing: border-box;
   }
 
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
+  }
+
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #65799b, #5e2563);
     color: #f0f0f0;
-    margin: 0;
     padding: 20px;
-    text-align: center;
     min-height: 100vh;
+
+    /* Center content horizontally with flexbox */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100vw;
+  }
+
+  #page-wrapper {
+    min-width: 900px;
+    max-width: 900px;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -29,6 +48,8 @@
     margin-bottom: 10px;
     letter-spacing: 2px;
     text-shadow: 0 0 8px #ffb347;
+    text-align: center;
+    width: 100%;
   }
 
   .calculator {
@@ -37,9 +58,10 @@
     border-radius: 16px;
     padding: 25px 30px 40px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
-    width: 100%;
-    max-width: 420px;
+    width: 420px;
+    max-width: 100%;
     margin-bottom: 40px;
+    user-select: none;
   }
 
   .input-group {
@@ -53,7 +75,6 @@
     font-size: 1rem;
     margin-bottom: 6px;
     color: #ffe9b3;
-    user-select: none;
   }
 
   input[type="number"] {
@@ -94,6 +115,7 @@
     transition: background-color 0.25s ease, box-shadow 0.25s ease;
     text-transform: uppercase;
     letter-spacing: 1.5px;
+    user-select: none;
   }
 
   button:hover {
@@ -101,40 +123,40 @@
     box-shadow: 0 8px 20px #ffd67a;
   }
 
-  /* EMI Schedule title */
   h3 {
     font-size: 1.6rem;
     font-weight: 900;
     color: #ffd67a;
     text-shadow: 0 0 8px #ffaa33;
-    margin-bottom: 5px;
+    margin: 0 0 15px 0;
+    width: 100%;
+    text-align: center;
+    user-select: none;
   }
 
-  /* Scrollable wrapper with horizontal scroll for desktop */
   .scrollable-wrapper {
-    width: 95%;
-    max-width: 900px;
-    margin: 0 auto 10px;
+    width: 900px;
+    max-width: 100vw;
+    margin: 0 auto 20px auto;
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(255, 182, 41, 0.6);
+    -webkit-overflow-scrolling: touch;
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(10px);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(255, 182, 41, 0.6);
   }
 
   .emi-schedule {
-    width: 100%;
+    width: 900px;
     border-radius: 16px;
     overflow: visible;
   }
 
   table {
-    width: 100%;
+    width: 900px;
     border-collapse: separate;
-    border-spacing: 8px 8px; /* space for margin effect */
+    border-spacing: 8px 8px;
     margin: 0;
-    min-width: 700px; /* Force horizontal scroll on desktop */
   }
 
   thead {
@@ -146,7 +168,7 @@
   }
 
   thead th {
-    padding: 18px 14px;
+    padding: 16px 14px;
     border-radius: 8px;
     border: 1px solid #ffb74d;
     word-break: break-word;
@@ -196,10 +218,9 @@
     table-layout: fixed;
   }
 
-  /* Summary lines container */
   .summary-line {
-    width: 95%;
-    max-width: 900px;
+    width: 900px;
+    max-width: 100vw;
     margin: 8px auto;
     font-weight: 700;
     font-size: 1.2rem;
@@ -210,6 +231,7 @@
     justify-content: center;
     gap: 20px;
     flex-wrap: wrap;
+    user-select: none;
   }
 
   .summary-line span {
@@ -225,7 +247,6 @@
     word-break: break-word;
   }
 
-  /* Group container for line 1 */
   .grouped-summary {
     background: #ffdc80;
     padding: 10px 20px;
@@ -233,86 +254,48 @@
     box-shadow: 0 6px 12px #fcbf49;
   }
 
-  /* Hidden class */
   .hidden {
     display: none;
   }
 
   /* Responsive */
-  @media (max-width: 960px) {
-    .scrollable-wrapper,
-    .summary-line {
+  @media (max-width: 940px) {
+    #page-wrapper {
+      min-width: 100%;
       max-width: 100%;
-      width: 95%;
-      margin: 10px auto;
-      flex-wrap: wrap;
+      padding: 0 10px;
     }
-    .grouped-summary {
-      width: 100%;
-      text-align: center;
-    }
-    tbody {
-      max-height: 280px;
-    }
-  }
-
-  @media (max-width: 600px) {
-    .scrollable-wrapper {
-      overflow-x: visible;  /* Disable horizontal scroll on small screens */
-      -webkit-overflow-scrolling: auto; /* Disable smooth scroll on touch */
-    }
-    table {
-      min-width: 100% !important; /* Make table width fit container */
-      border-spacing: 6px 6px;
-    }
-    thead th, tbody td {
-      padding: 10px 6px;
-      font-size: 0.9rem;
-      white-space: normal;
-      word-break: break-word;
-    }
-    tbody {
-      max-height: none;
-      overflow: visible;
-      display: table-row-group;
-    }
-    tbody tr {
-      display: table-row;
-    }
-  }
-
-  @media (max-width: 480px) {
     .calculator {
-      max-width: 100%;
-      padding: 25px 20px 35px;
+      width: 100%;
+      max-width: 420px;
     }
-    button {
-      font-size: 1rem;
-      padding: 12px;
-    }
-
-    h2 {
-      font-size: 1.8rem;
-    }
-
-    h3 {
-      font-size: 1.4rem;
-      margin-bottom: 10px;
-    }
-
     .summary-line {
-      flex-direction: column;
-      gap: 10px;
-      font-size: 1rem;
+      width: 100%;
+      max-width: none;
+      padding: 0 10px;
     }
+    .scrollable-wrapper {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
 
-    .summary-line span {
-      min-width: auto;
+  @media (max-width: 440px) {
+    .calculator {
+      padding: 20px 15px 35px;
+    }
+    .summary-line {
+      font-size: 1rem;
       padding: 6px 12px;
     }
-
-    .grouped-summary {
-      padding: 12px 15px;
+    h2 {
+      font-size: 1.8rem;
+      padding: 0 10px;
+    }
+    h3 {
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+      padding: 0 10px;
     }
   }
 
@@ -325,56 +308,56 @@
 </style>
 </head>
 <body>
-  <h2>EMI Calculator</h2>
-  <div class="calculator">
-    <div class="input-group">
-      <label for="amount">Loan Amount</label>
-      <input type="number" id="amount" placeholder="Enter Amount" min="0" />
+  <div id="page-wrapper">
+    <h2>EMI Calculator</h2>
+    <div class="calculator">
+      <div class="input-group">
+        <label for="amount">Loan Amount</label>
+        <input type="number" id="amount" placeholder="Enter Amount" min="0" />
+      </div>
+      <div class="input-group">
+        <label for="rate">Interest Rate % (p.a)</label>
+        <input type="number" id="rate" placeholder="Enter Interest Rate" step="0.01" min="0" />
+      </div>
+      <div class="input-group">
+        <label for="tenure">Tenure (Months)</label>
+        <input type="number" id="tenure" placeholder="Enter Tenure" min="1" />
+      </div>
+      <button id="calculateBtn">Calculate EMI</button>
     </div>
-    <div class="input-group">
-      <label for="rate">Interest Rate % (p.a)</label>
-      <input type="number" id="rate" placeholder="Enter Interest Rate" step="0.01" min="0" />
-    </div>
-    <div class="input-group">
-      <label for="tenure">Tenure (Months)</label>
-      <input type="number" id="tenure" placeholder="Enter Tenure" min="1" />
-    </div>
-    <button id="calculateBtn">Calculate EMI</button>
-  </div>
 
-  <h3 id="emiScheduleTitle" class="hidden">EMI Schedule</h3>
-  <div class="scrollable-wrapper hidden" id="emiScheduleDiv">
-    <div class="emi-schedule">
-      <table>
-        <thead>
-          <tr>
-            <th>Month</th>
-            <th>EMI<br>(P+I)</th>
-            <th>Principal<br>(P)</th>
-            <th>Interest<br>(I)</th>
-            <th>Tax<br>(I*18%)</th>
-            <th>Balance</th>
-          </tr>
-        </thead>
-        <tbody id="emiTableBody"></tbody>
-      </table>
+    <h3 id="emiScheduleTitle" class="hidden">EMI Schedule</h3>
+    <div class="scrollable-wrapper hidden" id="emiScheduleDiv">
+      <div class="emi-schedule">
+        <table>
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th>EMI<br>(P+I)</th>
+              <th>Principal<br>(P)</th>
+              <th>Interest<br>(I)</th>
+              <th>Tax<br>(I*18%)</th>
+              <th>Balance</th>
+            </tr>
+          </thead>
+          <tbody id="emiTableBody"></tbody>
+        </table>
+      </div>
     </div>
-  </div>
-  
-  <!-- toggle button removed -->
+    
+    <div class="summary-line grouped-summary hidden" id="summaryLine1">
+      <span><strong>Total Principal (P)</strong><br><span id="totalPrincipal">0.00</span></span>
+      <span><strong>Total Interest (I)</strong><br><span id="totalInterest">0.00</span></span>
+      <span><strong>(Principal + Interest)</strong><br><span id="totalAmountPaid">0.00</span></span>
+    </div>
 
-  <div class="summary-line grouped-summary hidden" id="summaryLine1">
-    <span><strong>Total Principal (P)</strong><br><span id="totalPrincipal">0.00</span></span>
-    <span><strong>Total Interest (I)</strong><br><span id="totalInterest">0.00</span></span>
-    <span><strong>Total (Principal + Interest)</strong><br><span id="totalAmountPaid">0.00</span></span>
-  </div>
-
-  <div class="summary-line grouped-summary hidden" id="summaryLine2">
-    <span><strong>Total GST 18%</strong><br><span id="totalGst">0.00</span></span>
-  </div>
-  
-  <div class="summary-line grouped-summary hidden" id="summaryLine3">
-    <span><strong>Total Amount (P + I + GST 18%)</strong><br><span id="totalWithGst">0.00</span></span>
+    <div class="summary-line grouped-summary hidden" id="summaryLine2">
+      <span><strong>Total GST 18%</strong><br><span id="totalGst">0.00</span></span>
+    </div>
+    
+    <div class="summary-line grouped-summary hidden" id="summaryLine3">
+      <span><strong>(Principal + Intrest + GST 18%)</strong><br><span id="totalWithGst">0.00</span></span>
+    </div>
   </div>
 
 <script>
@@ -463,9 +446,7 @@
         emiTableBody.appendChild(row);
       }
 
-      // Always enable scroll on desktop with max-height and scroll for tbody
-      const tbody = emiTableBody.parentElement;
-      tbody.classList.add('scrollable-tbody');
+      emiTableBody.parentElement.classList.add('scrollable-tbody');
 
       const totalAmountPaid = emi * tenure;
       const totalGST = totalInterestPaid * 0.18;
