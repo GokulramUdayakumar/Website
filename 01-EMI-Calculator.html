@@ -101,25 +101,6 @@
     box-shadow: 0 8px 20px #ffd67a;
   }
 
-  /* New toggle button */
-  #toggleViewBtn {
-    margin: 10px auto 30px auto;
-    width: 220px;
-    background: #4caf50;
-    color: #fff;
-    box-shadow: 0 6px 12px #6fdc6f;
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: 1.2px;
-    border-radius: 14px;
-    padding: 10px 0;
-    user-select: none;
-  }
-  #toggleViewBtn:hover {
-    background: #66bb6a;
-    box-shadow: 0 8px 20px #8fdf8f;
-  }
-
   /* EMI Schedule title */
   h3 {
     font-size: 1.6rem;
@@ -129,7 +110,7 @@
     margin-bottom: 5px;
   }
 
-  /* Scrollable wrapper for horizontal overflow */
+  /* Scrollable wrapper with horizontal scroll for desktop */
   .scrollable-wrapper {
     width: 95%;
     max-width: 900px;
@@ -145,7 +126,7 @@
   .emi-schedule {
     width: 100%;
     border-radius: 16px;
-    overflow: hidden;
+    overflow: visible;
   }
 
   table {
@@ -153,7 +134,7 @@
     border-collapse: separate;
     border-spacing: 8px 8px; /* space for margin effect */
     margin: 0;
-    min-width: 700px; /* Force horizontal scroll on small devices */
+    min-width: 700px; /* Force horizontal scroll on desktop */
   }
 
   thead {
@@ -168,10 +149,13 @@
     padding: 18px 14px;
     border-radius: 8px;
     border: 1px solid #ffb74d;
+    word-break: break-word;
   }
 
   tbody {
     display: block;
+    max-height: 360px;
+    overflow-y: auto;
   }
 
   tbody.scrollable-tbody {
@@ -225,6 +209,7 @@
     display: flex;
     justify-content: center;
     gap: 20px;
+    flex-wrap: wrap;
   }
 
   .summary-line span {
@@ -237,6 +222,7 @@
     border-radius: 14px;
     box-shadow: 0 6px 12px #fcbf49;
     text-align: center;
+    word-break: break-word;
   }
 
   /* Group container for line 1 */
@@ -265,6 +251,34 @@
       width: 100%;
       text-align: center;
     }
+    tbody {
+      max-height: 280px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .scrollable-wrapper {
+      overflow-x: visible;  /* Disable horizontal scroll on small screens */
+      -webkit-overflow-scrolling: auto; /* Disable smooth scroll on touch */
+    }
+    table {
+      min-width: 100% !important; /* Make table width fit container */
+      border-spacing: 6px 6px;
+    }
+    thead th, tbody td {
+      padding: 10px 6px;
+      font-size: 0.9rem;
+      white-space: normal;
+      word-break: break-word;
+    }
+    tbody {
+      max-height: none;
+      overflow: visible;
+      display: table-row-group;
+    }
+    tbody tr {
+      display: table-row;
+    }
   }
 
   @media (max-width: 480px) {
@@ -275,11 +289,6 @@
     button {
       font-size: 1rem;
       padding: 12px;
-    }
-
-    thead th, tbody td {
-      font-size: 1rem;
-      padding: 12px 8px;
     }
 
     h2 {
@@ -305,18 +314,12 @@
     .grouped-summary {
       padding: 12px 15px;
     }
-
-    #toggleViewBtn {
-      width: 100%;
-      max-width: 280px;
-      margin: 15px auto 30px auto;
-    }
   }
 
   @media (max-width: 360px) {
     thead th, tbody td {
-      font-size: 0.85rem;
-      padding: 8px 6px;
+      font-size: 0.8rem;
+      padding: 8px 5px;
     }
   }
 </style>
@@ -358,12 +361,12 @@
     </div>
   </div>
   
-  <button id="toggleViewBtn" class="hidden">View Full Table</button>
+  <!-- toggle button removed -->
 
   <div class="summary-line grouped-summary hidden" id="summaryLine1">
     <span><strong>Total Principal (P)</strong><br><span id="totalPrincipal">0.00</span></span>
     <span><strong>Total Interest (I)</strong><br><span id="totalInterest">0.00</span></span>
-    <span><strong>Total (Principal + Intrest)</strong><br><span id="totalAmountPaid">0.00</span></span>
+    <span><strong>Total (Principal + Interest)</strong><br><span id="totalAmountPaid">0.00</span></span>
   </div>
 
   <div class="summary-line grouped-summary hidden" id="summaryLine2">
@@ -386,14 +389,12 @@
     const totalAmountPaidEl = document.getElementById('totalAmountPaid');
     const totalGstEl = document.getElementById('totalGst');
     const totalWithGstEl = document.getElementById('totalWithGst');
-    const tbodyElement = document.querySelector('tbody');
 
     const emiScheduleDiv = document.getElementById('emiScheduleDiv');
     const emiScheduleTitle = document.getElementById('emiScheduleTitle');
     const summaryLine1 = document.getElementById('summaryLine1');
     const summaryLine2 = document.getElementById('summaryLine2');
     const summaryLine3 = document.getElementById('summaryLine3');
-    const toggleViewBtn = document.getElementById('toggleViewBtn');
 
     function formatMoney(num) {
       return num.toFixed(2);
@@ -462,16 +463,9 @@
         emiTableBody.appendChild(row);
       }
 
-      // Show toggleViewBtn only if tenure > 9
-      if (tenure > 9) {
-        tbodyElement.classList.add('scrollable-tbody');
-        toggleViewBtn.textContent = "View Full Table";
-        toggleViewBtn.classList.remove('hidden');
-        fullView = false; // reset toggle state
-      } else {
-        tbodyElement.classList.remove('scrollable-tbody');
-        toggleViewBtn.classList.add('hidden');
-      }
+      // Always enable scroll on desktop with max-height and scroll for tbody
+      const tbody = emiTableBody.parentElement;
+      tbody.classList.add('scrollable-tbody');
 
       const totalAmountPaid = emi * tenure;
       const totalGST = totalInterestPaid * 0.18;
@@ -489,19 +483,6 @@
       summaryLine2.classList.remove('hidden');
       summaryLine3.classList.remove('hidden');
     }
-
-    // Toggle View button functionality
-    let fullView = false;
-    toggleViewBtn.addEventListener('click', () => {
-      fullView = !fullView;
-      if (fullView) {
-        tbodyElement.classList.remove('scrollable-tbody');
-        toggleViewBtn.textContent = "View Scrollable Table";
-      } else {
-        tbodyElement.classList.add('scrollable-tbody');
-        toggleViewBtn.textContent = "View Full Table";
-      }
-    });
 
     calculateBtn.addEventListener('click', calculateEMI);
   })();
