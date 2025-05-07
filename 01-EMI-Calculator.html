@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=900" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>EMI Calculator</title>
 <style>
   /* Reset and base */
@@ -29,7 +29,7 @@
     width: 100vw;
   }
   #page-wrapper {
-    min-width: 900px;
+    min-width: 320px;
     max-width: 900px;
     margin: 0 auto;
     display: flex;
@@ -119,8 +119,8 @@
     user-select: none;
   }
   .scrollable-wrapper {
-    width: 900px;
-    max-width: 100vw;
+    width: 100%;
+    max-width: 900px;
     margin: 0 auto 20px auto;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -130,13 +130,14 @@
     box-shadow: 0 10px 30px rgba(255, 182, 41, 0.6);
   }
   .emi-schedule {
-    width: 900px;
+    width: 100%;
+    max-width: 900px;
     border-radius: 16px;
-    /* Removed overflow hidden so scroll applies to tbody */
     overflow: visible;
   }
   table {
-    width: 900px;
+    width: 100%;
+    max-width: 900px;
     border-collapse: separate;
     border-spacing: 8px 8px;
     margin: 0;
@@ -192,8 +193,8 @@
     table-layout: fixed;
   }
   .summary-line {
-    width: 900px;
-    max-width: 100vw;
+    width: 100%;
+    max-width: 900px;
     margin: 8px auto;
     font-weight: 700;
     font-size: 1.2rem;
@@ -225,7 +226,7 @@
     box-shadow: 0 6px 12px #fcbf49;
   }
   .hidden {
-    display: none;
+    display: none !important;
   }
   /* Center and style the View Full Schedule button */
   #viewFullBtn {
@@ -516,7 +517,8 @@
     });
 
     emiTableBody.parentElement.classList.add('scrollable-tbody');
-    viewFullBtn.classList.remove('hidden'); // Always show after calculation
+    // Show the "View Full Schedule" button after calculation
+    viewFullBtn.classList.remove('hidden');
 
     // Populate modal table with all rows
     rows.forEach(rowHTML=>{
