@@ -10,17 +10,29 @@
     box-sizing: border-box;
   }
 
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
+
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #65799b, #5e2563);
     color: #f0f0f0;
-    margin: 0;
     padding: 20px;
     text-align: center;
-    min-height: 100vh;
+    /* Center content initially */
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
+    min-height: 100vh;
+    transition: all 0.5s ease;
+  }
+
+  body.loaded {
+    /* Normal after loading */
+    display: block;
+    min-height: auto;
   }
 
   h2 {
@@ -129,23 +141,28 @@
     margin-bottom: 5px;
   }
 
-  /* Wider table outside layout box */
-  .emi-schedule {
+  /* Scrollable wrapper for horizontal overflow */
+  .scrollable-wrapper {
     width: 95%;
     max-width: 900px;
     margin: 0 auto 10px;
+    overflow-x: auto;
     border-radius: 16px;
-    overflow: hidden;
     box-shadow: 0 10px 30px rgba(255, 182, 41, 0.6);
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(10px);
   }
 
+  .emi-schedule {
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
   table {
     width: 100%;
+    border-collapse: collapse;
     margin: 0;
-    border-collapse: separate;
-    border-spacing: 0;
   }
 
   thead {
@@ -158,6 +175,7 @@
 
   thead th {
     padding: 18px 14px;
+    border: 1px solid #ffb74d;
   }
 
   tbody {
@@ -191,6 +209,7 @@
   tbody td {
     padding: 16px 14px;
     white-space: nowrap;
+    border: 1px solid rgba(255, 255, 255, 0.3);
   }
 
   thead, tbody tr {
@@ -241,7 +260,8 @@
 
   /* Responsive */
   @media (max-width: 960px) {
-    .emi-schedule, .summary-line {
+    .scrollable-wrapper,
+    .summary-line {
       max-width: 100%;
       width: 95%;
       margin: 10px auto;
@@ -308,6 +328,7 @@
 </style>
 </head>
 <body>
+  <div id="centerWrapper">
   <h2>EMI Calculator</h2>
   <div class="calculator">
     <div class="input-group">
@@ -326,20 +347,22 @@
   </div>
 
   <h3 id="emiScheduleTitle" class="hidden">EMI Schedule</h3>
-  <div class="emi-schedule hidden" id="emiScheduleDiv">
-    <table>
-      <thead>
-        <tr>
-          <th>Month</th>
-          <th>EMI<br>(P+I)</th>
-          <th>Principal<br>(P)</th>
-          <th>Interest<br>(I)</th>
-          <th>Tax<br>(I*18%)</th>
-          <th>Balance</th>
-        </tr>
-      </thead>
-      <tbody id="emiTableBody"></tbody>
-    </table>
+  <div class="scrollable-wrapper hidden" id="emiScheduleDiv">
+    <div class="emi-schedule">
+      <table>
+        <thead>
+          <tr>
+            <th>Month</th>
+            <th>EMI<br>(P+I)</th>
+            <th>Principal<br>(P)</th>
+            <th>Interest<br>(I)</th>
+            <th>Tax<br>(I*18%)</th>
+            <th>Balance</th>
+          </tr>
+        </thead>
+        <tbody id="emiTableBody"></tbody>
+      </table>
+    </div>
   </div>
   
   <button id="toggleViewBtn" class="hidden">View Full Table</button>
@@ -357,6 +380,7 @@
   <div class="summary-line grouped-summary hidden" id="summaryLine3">
     <span><strong>Total Amount (P + I + GST 18%):</strong> <span id="totalWithGst">0.00</span></span>
   </div>
+  </div>
 
 <script>
   (() => {
@@ -370,7 +394,6 @@
     const totalAmountPaidEl = document.getElementById('totalAmountPaid');
     const totalGstEl = document.getElementById('totalGst');
     const totalWithGstEl = document.getElementById('totalWithGst');
-    const tbodyElement = document.querySelector('tbody');
 
     const emiScheduleDiv = document.getElementById('emiScheduleDiv');
     const emiScheduleTitle = document.getElementById('emiScheduleTitle');
@@ -378,6 +401,7 @@
     const summaryLine2 = document.getElementById('summaryLine2');
     const summaryLine3 = document.getElementById('summaryLine3');
     const toggleViewBtn = document.getElementById('toggleViewBtn');
+    const tbodyElement = document.querySelector('tbody');
 
     function formatMoney(num) {
       return num.toFixed(2);
@@ -488,7 +512,14 @@
     });
 
     calculateBtn.addEventListener('click', calculateEMI);
+
+    // After page load, remove centering and set to normal layout
+    window.addEventListener('load', () => {
+      document.body.classList.add('loaded');
+    });
   })();
 </script>
 </body>
 </html>
+</content>
+</create_file>
