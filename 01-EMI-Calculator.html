@@ -10,40 +10,17 @@
     box-sizing: border-box;
   }
 
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #65799b, #5e2563);
     color: #f0f0f0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
-
-  body {
+    margin: 0;
+    padding: 20px;
+    text-align: center;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
-  }
-
-  /* Container that centers the calculator vertically and horizontally */
-  #calcContainer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    width: 100%;
-    max-width: 420px;
-  }
-
-  /* Hide calc container vertical centering once schedule visible */
-  body.calculated #calcContainer {
-    min-height: auto;
-    height: auto;
-    margin-bottom: 40px;
-    justify-content: flex-start;
-    align-items: stretch;
   }
 
   h2 {
@@ -52,7 +29,6 @@
     margin-bottom: 10px;
     letter-spacing: 2px;
     text-shadow: 0 0 8px #ffb347;
-    text-align: center;
   }
 
   .calculator {
@@ -62,6 +38,8 @@
     padding: 25px 30px 40px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
     width: 100%;
+    max-width: 420px;
+    margin-bottom: 40px;
   }
 
   .input-group {
@@ -149,7 +127,6 @@
     color: #ffd67a;
     text-shadow: 0 0 8px #ffaa33;
     margin-bottom: 5px;
-    text-align: center;
   }
 
   /* Scrollable wrapper for horizontal overflow */
@@ -172,7 +149,8 @@
 
   table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 8px 8px; /* add spacing between cells for margin effect */
     margin: 0;
   }
 
@@ -186,6 +164,7 @@
 
   thead th {
     padding: 18px 14px;
+    border-radius: 8px;
     border: 1px solid #ffb74d;
   }
 
@@ -206,6 +185,7 @@
     font-weight: 600;
     font-size: 1.1rem;
     transition: background-color 0.3s ease;
+    border-radius: 8px;
   }
 
   tbody tr:nth-child(even) {
@@ -220,7 +200,8 @@
   tbody td {
     padding: 16px 14px;
     white-space: nowrap;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
   }
 
   thead, tbody tr {
@@ -282,14 +263,11 @@
       width: 100%;
       text-align: center;
     }
-    #calcContainer {
-      max-width: 100%;
-      padding: 20px;
-    }
   }
 
   @media (max-width: 480px) {
     .calculator {
+      max-width: 100%;
       padding: 25px 20px 35px;
     }
     button {
@@ -342,25 +320,21 @@
 </style>
 </head>
 <body>
-  <div id="calcContainer">
-    <div>
-      <h2>EMI Calculator</h2>
-      <div class="calculator">
-        <div class="input-group">
-          <label for="amount">Loan Amount</label>
-          <input type="number" id="amount" placeholder="Enter Amount" min="0" />
-        </div>
-        <div class="input-group">
-          <label for="rate">Interest Rate % (p.a)</label>
-          <input type="number" id="rate" placeholder="Enter Interest Rate" step="0.01" min="0" />
-        </div>
-        <div class="input-group">
-          <label for="tenure">Tenure (Months)</label>
-          <input type="number" id="tenure" placeholder="Enter Tenure" min="1" />
-        </div>
-        <button id="calculateBtn">Calculate EMI</button>
-      </div>
+  <h2>EMI Calculator</h2>
+  <div class="calculator">
+    <div class="input-group">
+      <label for="amount">Loan Amount</label>
+      <input type="number" id="amount" placeholder="Enter Amount" min="0" />
     </div>
+    <div class="input-group">
+      <label for="rate">Interest Rate % (p.a)</label>
+      <input type="number" id="rate" placeholder="Enter Interest Rate" step="0.01" min="0" />
+    </div>
+    <div class="input-group">
+      <label for="tenure">Tenure (Months)</label>
+      <input type="number" id="tenure" placeholder="Enter Tenure" min="1" />
+    </div>
+    <button id="calculateBtn">Calculate EMI</button>
   </div>
 
   <h3 id="emiScheduleTitle" class="hidden">EMI Schedule</h3>
@@ -410,6 +384,7 @@
     const totalAmountPaidEl = document.getElementById('totalAmountPaid');
     const totalGstEl = document.getElementById('totalGst');
     const totalWithGstEl = document.getElementById('totalWithGst');
+    const tbodyElement = document.querySelector('tbody');
 
     const emiScheduleDiv = document.getElementById('emiScheduleDiv');
     const emiScheduleTitle = document.getElementById('emiScheduleTitle');
@@ -417,7 +392,6 @@
     const summaryLine2 = document.getElementById('summaryLine2');
     const summaryLine3 = document.getElementById('summaryLine3');
     const toggleViewBtn = document.getElementById('toggleViewBtn');
-    const tbodyElement = document.querySelector('tbody');
 
     function formatMoney(num) {
       return num.toFixed(2);
@@ -512,9 +486,6 @@
       summaryLine1.classList.remove('hidden');
       summaryLine2.classList.remove('hidden');
       summaryLine3.classList.remove('hidden');
-
-      // Add class to body to remove vertical centering after calculation
-      document.body.classList.add('calculated');
     }
 
     // Toggle View button functionality
