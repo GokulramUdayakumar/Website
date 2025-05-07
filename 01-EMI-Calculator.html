@@ -1,82 +1,340 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EMI Calculator</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        table { width: 80%; margin: 20px auto; border-collapse: collapse; }
-        th, td { border: 1px solid black; padding: 10px; text-align: center; }
-        input { margin: 5px; padding: 5px; }
-        button { padding: 10px; }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>EMI Calculator</title>
+<style>
+  /* Reset and base */
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #65799b, #5e2563);
+    color: #f0f0f0;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  h2 {
+    font-weight: 900;
+    font-size: 2.4rem;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+    text-shadow: 0 0 8px #ffb347;
+  }
+
+  .calculator {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(14px);
+    border-radius: 16px;
+    padding: 25px 30px 40px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    width: 100%;
+    max-width: 350px;
+  }
+
+  .input-group {
+    margin-bottom: 20px;
+    text-align: left;
+  }
+
+  label {
+    display: block;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 6px;
+    color: #ffe9b3;
+    user-select: none;
+  }
+
+  input[type="number"] {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: none;
+    font-size: 1.1rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  input[type="number"]::placeholder {
+    color: #ddd;
+    font-weight: 400;
+  }
+
+  input[type="number"]:focus {
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 10px #ffd67a;
+  }
+
+  button {
+    margin-top: 10px;
+    width: 100%;
+    background: #ffa726;
+    border: none;
+    padding: 14px;
+    border-radius: 14px;
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: #332a07;
+    cursor: pointer;
+    box-shadow: 0 6px 12px #fcbf49;
+    transition: background-color 0.25s ease, box-shadow 0.25s ease;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+
+  button:hover {
+    background: #ffb74d;
+    box-shadow: 0 8px 20px #ffd67a;
+  }
+
+  h3 {
+    margin-top: 40px;
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #ffd67a;
+    text-shadow: 0 0 8px #ffaa33;
+  }
+
+  table {
+    width: 100%;
+    margin-top: 15px;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 28px rgba(255, 182, 41, 0.5);
+    background: rgba(255 255 255 / 0.15);
+    backdrop-filter: blur(8px);
+  }
+
+  thead {
+    background: #ffb74d;
+    color: #332a07;
+    font-weight: 800;
+    font-size: 1.05rem;
+    user-select: none;
+  }
+
+  thead th {
+    padding: 12px 8px;
+  }
+
+  tbody tr {
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+  }
+
+  tbody tr:nth-child(even) {
+    background: rgba(0,0,0,0.15);
+  }
+
+  tbody tr:hover {
+    background: #ffb74d99;
+    color: #332a07;
+  }
+
+  tbody td {
+    padding: 10px 8px;
+  }
+
+  .summary {
+    margin-top: 25px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #ffd67a;
+    text-shadow: 0 0 6px #ffaa33;
+    line-height: 1.6;
+  }
+
+  .summary span {
+    display: inline-block;
+    min-width: 110px;
+    color: #332a07;
+    font-weight: 900;
+    background: #ffb74d;
+    padding: 6px 14px;
+    border-radius: 14px;
+    box-shadow: 0 6px 12px #fcbf49;
+    margin-left: 10px;
+  }
+
+  /* Responsive */
+  @media (max-width: 380px) {
+    .calculator {
+      padding: 20px 18px 36px;
+    }
+    button {
+      font-size: 1rem;
+      padding: 12px;
+    }
+    thead th, tbody td {
+      font-size: 0.8rem;
+      padding: 8px 6px;
+    }
+    h2 {
+      font-size: 1.8rem;
+    }
+  }
+</style>
 </head>
 <body>
-    <h2>EMI Calculator</h2>
-    <label>Loan Amount: <input type="number" id="amount" placeholder="Enter amount"></label><br>
-    <label>Interest Rate (% per annum): <input type="number" id="rate" placeholder="Enter rate"></label><br>
-    <label>Tenure (Months): <input type="number" id="tenure" placeholder="Enter tenure"></label><br>
-    <button onclick="calculateEMI()">Calculate EMI</button>
-    
-    <h3>EMI Table</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Month</th>
-                <th>EMI<br>(P+I)</th>
-                <th>Principal<br>(P)</th>
-                <th>Interest<br>(I)</th>
-                <th>Tax<br>(I*18%)</th>
-                <th>Balance</th>
-            </tr>
-        </thead>
-        <tbody id="emiTableBody">
-        </tbody>
-    </table>
-    
-    <h3>Total Summary</h3>
-    <p><strong>Principal Ammount (P):</strong> <span id="totalPrincipal">0.00</span></p>
-    <p><strong>Total Interest (I):</strong> <span id="totalInterest">0.00</span></p>
-    <p><strong>Total Ammount (P+I):</strong> <span id="totalAmountPaid">0.00</span></p>
+  <h2>EMI Calculator</h2>
+  <div class="calculator">
+    <div class="input-group">
+      <label for="amount">Loan Amount</label>
+      <input type="number" id="amount" placeholder="Enter amount" min="0" />
+    </div>
+    <div class="input-group">
+      <label for="rate">Interest Rate (% p.a.)</label>
+      <input type="number" id="rate" placeholder="Enter interest rate" step="0.01" min="0" />
+    </div>
+    <div class="input-group">
+      <label for="tenure">Tenure (Months)</label>
+      <input type="number" id="tenure" placeholder="Enter tenure" min="1" />
+    </div>
+    <button id="calculateBtn">Calculate EMI</button>
 
-    <script>
-        function calculateEMI() {
-            let amount = parseFloat(document.getElementById("amount").value);
-            let rate = parseFloat(document.getElementById("rate").value) / 100 / 12;
-            let tenure = parseInt(document.getElementById("tenure").value);
-            
-            let emi = (amount * rate * Math.pow(1 + rate, tenure)) / (Math.pow(1 + rate, tenure) - 1);
-            let balance = amount;
-            let totalInterestPaid = 0;
-            
-            let tableBody = document.getElementById("emiTableBody");
-            tableBody.innerHTML = "";
-            
-            for (let month = 1; month <= tenure; month++) {
-                let interest = balance * rate;
-                let principal = emi - interest;
-                let taxAmount = interest * 0.18;
-                balance -= principal;
-                totalInterestPaid += interest;
-                
-                let row = `<tr>
-                    <td>${month}</td>
-                    <td>${(principal + interest).toFixed(2)}</td>
-                    <td>${principal.toFixed(2)}</td>
-                    <td>${interest.toFixed(2)}</td>                  
-                    <td>${taxAmount.toFixed(2)}</td>
-                    <td>${balance.toFixed(2)}</td>
-                </tr>`;
-                
-                tableBody.innerHTML += row;
-            }
-            
-            let totalAmountPaid = emi * tenure;
-            document.getElementById("totalPrincipal").innerText = amount.toFixed(2);
-            document.getElementById("totalInterest").innerText = totalInterestPaid.toFixed(2);
-            document.getElementById("totalAmountPaid").innerText = totalAmountPaid.toFixed(2);
+    <h3>EMI Schedule</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th>EMI (P + I)</th>
+          <th>Principal (P)</th>
+          <th>Interest (I)</th>
+          <th>Tax (I × 18%)</th>
+          <th>Balance</th>
+        </tr>
+      </thead>
+      <tbody id="emiTableBody"></tbody>
+    </table>
+
+    <div class="summary">
+      <p><strong>Total Principal (P):</strong> <span id="totalPrincipal">0.00</span></p>
+      <p><strong>Total Interest (I):</strong> <span id="totalInterest">0.00</span></p>
+      <p><strong>Total Amount (P + I):</strong> <span id="totalAmountPaid">0.00</span></p>
+    </div>
+  </div>
+
+<script>
+  (() => {
+    const amountInput = document.getElementById('amount');
+    const rateInput = document.getElementById('rate');
+    const tenureInput = document.getElementById('tenure');
+    const calculateBtn = document.getElementById('calculateBtn');
+    const emiTableBody = document.getElementById('emiTableBody');
+    const totalPrincipalEl = document.getElementById('totalPrincipal');
+    const totalInterestEl = document.getElementById('totalInterest');
+    const totalAmountPaidEl = document.getElementById('totalAmountPaid');
+
+    function formatMoney(num) {
+      return num.toFixed(2);
+    }
+
+    function validateInputs() {
+      const amount = parseFloat(amountInput.value);
+      const rate = parseFloat(rateInput.value);
+      const tenure = parseInt(tenureInput.value, 10);
+
+      if (isNaN(amount) || amount <= 0) {
+        alert("Please enter a valid Loan Amount greater than 0.");
+        return false;
+      }
+      if (isNaN(rate) || rate < 0) {
+        alert("Please enter a valid Interest Rate (0 or positive).");
+        return false;
+      }
+      if (isNaN(tenure) || tenure <= 0 || !Number.isInteger(tenure)) {
+        alert("Please enter a valid Tenure (positive integer).");
+        return false;
+      }
+      return true;
+    }
+
+    function calculateEMI() {
+      if (!validateInputs()) {
+        return;
+      }
+
+      const amount = parseFloat(amountInput.value);
+      const monthlyRate = parseFloat(rateInput.value) / 100 / 12;
+      const tenure = parseInt(tenureInput.value, 10);
+
+      // EMI formula: E = P*r*(1+r)^n / ((1+r)^n -1)
+      const emi = monthlyRate === 0
+        ? amount / tenure
+        : (amount * monthlyRate * Math.pow(1 + monthlyRate, tenure)) / (Math.pow(1 + monthlyRate, tenure) - 1);
+
+      let balance = amount;
+      let totalInterestPaid = 0;
+
+      emiTableBody.innerHTML = '';
+
+      for (let month = 1; month <= tenure; month++) {
+        const interest = balance * monthlyRate;
+        const principal = emi - interest;
+        const tax = interest * 0.18;
+        balance -= principal;
+
+        // Correct any floating point tiny error for last balance
+        if (month === tenure) {
+          balance = 0;
         }
-    </script>
+
+        totalInterestPaid += interest;
+
+        const row = document.createElement('tr');
+
+        row.innerHTML = `
+          <td>${month}</td>
+          <td>${formatMoney(principal + interest)}</td>
+          <td>${formatMoney(principal)}</td>
+          <td>${formatMoney(interest)}</td>
+          <td>${formatMoney(tax)}</td>
+          <td>${formatMoney(balance)}</td>
+        `;
+        emiTableBody.appendChild(row);
+      }
+
+      const totalAmountPaid = emi * tenure;
+
+      totalPrincipalEl.textContent = formatMoney(amount);
+      totalInterestEl.textContent = formatMoney(totalInterestPaid);
+      totalAmountPaidEl.textContent = formatMoney(totalAmountPaid);
+    }
+
+    calculateBtn.addEventListener('click', calculateEMI);
+
+    // Optional: Calculate live on input change (uncomment to enable)
+    // [amountInput, rateInput, tenureInput].forEach(input => {
+    //   input.addEventListener('input', () => {
+    //     if (amountInput.value && rateInput.value && tenureInput.value) {
+    //       calculateEMI();
+    //     }
+    //   });
+    // });
+
+  })();
+</script>
 </body>
 </html>
+</content>
+
+```
