@@ -122,8 +122,6 @@
     width: 100%;
     max-width: 900px;
     margin: 0 auto 20px auto;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(10px);
     border-radius: 16px;
@@ -133,7 +131,6 @@
     width: 100%;
     max-width: 900px;
     border-radius: 16px;
-    overflow: visible;
   }
   table {
     width: 100%;
@@ -141,6 +138,8 @@
     border-collapse: separate;
     border-spacing: 8px 8px;
     margin: 0;
+    table-layout: fixed;
+    min-width: 720px; /* Force table minimum width to keep desktop layout on mobile */
   }
   thead {
     background: #ffb74d;
@@ -148,17 +147,19 @@
     font-weight: 800;
     font-size: 1.3rem;
     user-select: none;
+    display: table-header-group;
   }
   thead th {
     padding: 16px 14px;
     border-radius: 8px;
     border: 1px solid #ffb74d;
     word-break: break-word;
+    text-align: center;
   }
   tbody {
     display: block;
-    max-height: 360px; /* restrict tbody height to enable scroll */
-    overflow-y: auto;
+    max-height: none;
+    overflow-y: visible;
   }
   tbody.scrollable-tbody {
     max-height: 360px;
@@ -186,6 +187,7 @@
     white-space: nowrap;
     background: rgba(255, 255, 255, 0.12);
     border-radius: 8px;
+    text-align: center;
   }
   thead, tbody tr {
     display: table;
@@ -281,9 +283,9 @@
           <thead>
             <tr>
               <th>Month</th>
-              <th>EMI<br>(P+I)</th>
               <th>Principal<br>(P)</th>
               <th>Interest<br>(I)</th>
+              <th>EMI<br>(P+I)</th>
               <th>Tax<br>(I*18%)</th>
               <th>Balance</th>
             </tr>
@@ -389,9 +391,9 @@
 
       const rowHTML = `
         <td>${month}</td>
-        <td>${formatMoney(principal + interest)}</td>
         <td>${formatMoney(principal)}</td>
         <td>${formatMoney(interest)}</td>
+        <td>${formatMoney(principal + interest)}</td>
         <td>${formatMoney(tax)}</td>
         <td>${formatMoney(balance)}</td>
       `;
@@ -399,14 +401,19 @@
       fullScheduleRows.push(rowHTML);
     }
 
-    // Display the rows in preview table with vertical scroll
+    // Apply scroll only if tenure > 10
+    if (tenure > 9) {
+      emiTableBody.classList.add('scrollable-tbody');
+    } else {
+      emiTableBody.classList.remove('scrollable-tbody');
+    }
+
     rows.forEach(row => {
       const tr = document.createElement('tr');
       tr.innerHTML = row;
       emiTableBody.appendChild(tr);
     });
 
-    emiTableBody.parentElement.classList.add('scrollable-tbody');
     viewFullBtn.classList.remove('hidden');
 
     const totalAmountPaid = emi * tenure;
@@ -466,6 +473,8 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
+            table-layout: fixed;
+            min-width: 720px; /* Keep desktop layout */
           }
           th, td {
             padding: 12px;
@@ -531,25 +540,6 @@
             background-color: #66bb6a;
             box-shadow: 0 8px 20px #81c784;
           }
-          @media (max-width: 600px) {
-            body {
-              padding: 10px;
-            }
-            button {
-              width: 100%;
-              font-size: 1rem;
-            }
-            table, th, td {
-              font-size: 0.9rem;
-            }
-            .summary-container {
-              flex-direction: column;
-              gap: 10px;
-            }
-            .summary-item {
-              min-width: auto;
-            }
-          }
         </style>
       </head>
       <body>
@@ -559,9 +549,9 @@
           <thead>
             <tr>
               <th>Month</th>
-              <th>EMI (P+I)</th>
               <th>Principal (P)</th>
               <th>Interest (I)</th>
+              <th>EMI (P+I)</th>
               <th>Tax (I*18%)</th>
               <th>Balance</th>
             </tr>
@@ -615,11 +605,10 @@
   // Hide "View Full Schedule" button initially
   document.addEventListener('DOMContentLoaded', () => {
     viewFullBtn.classList.add('hidden');
-    emiTableBody.parentElement.classList.remove('scrollable-tbody');
+    emiTableBody.classList.remove('scrollable-tbody');
   });
 })();
 </script>
 </body>
 </html>
-</content>
-</create_file>
+
